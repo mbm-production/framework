@@ -227,15 +227,7 @@ class Builder
     {
         $this->columns = [];
         $this->bindings['select'] = [];
-        $columns = is_array($columns) ? $columns : func_get_args();
-
-        foreach ($columns as $as => $column) {
-            if (is_string($as) && $this->isQueryable($column)) {
-                $this->selectSub($column, $as);
-            } else {
-                $this->columns[] = $column;
-            }
-        }
+        $this->addSelect($columns);
 
         return $this;
     }
@@ -362,7 +354,7 @@ class Builder
         foreach ($columns as $as => $column) {
             if (is_string($as) && $this->isQueryable($column)) {
                 if (is_null($this->columns)) {
-                    $this->select($this->from.'.*');
+                    $this->columns[] = $this->from.'.*';
                 }
 
                 $this->selectSub($column, $as);
@@ -370,6 +362,7 @@ class Builder
                 $this->columns[] = $column;
             }
         }
+        $this->columns = array_unique($this->columns);
 
         return $this;
     }
